@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "libauto.h"
+#include "libauto2.h"
 
 int main()
 {
@@ -17,12 +17,20 @@ int main()
     {
     case 1:
         {
-            nodoAuto *aux=crearNodo('aa123', 234, 'bm');
+            nodoAuto *lista=iniclista();
 
-            mostrarNodo(aux);
+            agregarMuchos(&lista);
+
+            int suma=0;
+
+            suma=sumaRecursivaPar(lista);
+
+            printf ("%d", suma);
+
         }break;
     case 2:
         {
+
 
         }break;
     case 3:
@@ -35,4 +43,5 @@ int main()
         }break;
     }
     return 0;
+
 }
