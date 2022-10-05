@@ -1,21 +1,24 @@
-#include "librerias.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "librerias.h"
 
-nodo *iniclista ()
+nodoS *iniclista ()
 {
     return NULL;
 }
 
-nodo *crearNodo (int dato)
+nodoS *crearNodo (stYoutuber dato)
 {
-    nodo *aux= (nodo*)malloc(sizeof(nodo));
-    aux->dato=dato;
+    nodoS *aux=(nodoS*)malloc(sizeof(nodoS));
+
+    aux->dato.id=dato.id;
+    strcpy(aux->dato.nombreCanal, dato.nombreCanal);
+    aux->dato.cantSuscriptores=dato.cantSuscriptores;
 
     return aux;
 }
 
-nodo *agregarPrincipio (nodo *lista, nodo *nn)
+nodoS *agregarAlFinalRecursivo (nodoS *lista, nodoS *nn)
 {
     if (lista==NULL)
     {
@@ -23,20 +26,113 @@ nodo *agregarPrincipio (nodo *lista, nodo *nn)
     }
     else
     {
-        nn->sig=lista;
-        lista=nn;
+        if(lista->sig==NULL)
+        {
+            lista->sig=nn;
+        }
+        else
+        {
+            lista=agregarAlFinalRecursivo(lista->sig, nn);
+        }
     }
 
     return lista;
 }
 
-nodo *agregarFinal (nodo *lista, nodo *nn)
+nodoS *deArchivoALista (char nombreArchivo[])
 {
-    nodo *seg=lista;
+    nodoS *lista=iniclista();
+    nodoS *aux1;
 
-    if(seg==NULL)
+    stYoutuber aux;
+
+    FILE *archivo=fopen(nombreArchivo, "rb");
+
+    if(archivo!=NULL)
     {
-        seg=nn;
+        while (fread(&aux, sizeof(stYoutuber), 1, archivo)>0)
+        {
+            aux1=crearNodo(aux);
+
+            lista=agregarAlFinalRecursivo(lista, aux1);
+        }
+
+        fclose(archivo);
+    }
+
+    return lista;
+}
+
+
+///2
+void mostrarYoutuber (stYoutuber aux)
+{
+    printf ("nombre: %s\n", aux.nombreCanal);
+    printf ("id: %d\n", aux.id);
+    printf ("cant sus: %d\n", aux.cantSuscriptores);
+}
+
+void mostrarLista(nodoS *lista)
+{
+    nodoS *seg=lista;
+    while(seg!=NULL)
+    {
+        mostrarYoutuber(seg->dato);
+        seg=seg->sig;
+    }
+}
+
+void verArchivo (char nombreArchivo[])
+{
+    stYoutuber aux;
+
+    FILE *archivo=fopen(nombreArchivo, "rb");
+
+    if(archivo!=NULL)
+    {
+        while (fread(&aux, sizeof(stYoutuber), 1, archivo)>0)
+        {
+             printf ("nombre: %s\n", aux.nombreCanal);
+    printf ("id: %d\n", aux.id);
+    printf ("cant sus: %d\n", aux.cantSuscriptores);
+        }
+
+        fclose(archivo);
+    }
+
+}
+///3
+void mostrarNodoEspecificoRecursivo (nodoS *lista)
+{
+    if(lista!=NULL)
+    {
+        if(800>lista->dato.cantSuscriptores)
+        {
+            mostrarYoutuber(lista->dato);
+        }
+
+        mostrarNodoEspecificoRecursivo(lista->sig);
+    }
+}
+
+///4
+//C
+nodoD *crearNodoDoble (stYoutuber dato)
+{
+    nodoD *aux=(nodoD*)malloc(sizeof(nodoD));
+
+    aux->dato.id=dato.id;
+    strcpy(aux->dato.nombreCanal, dato.nombreCanal);
+    aux->dato.cantSuscriptores=dato.cantSuscriptores;
+
+    return aux;
+}
+nodoD *agregarAlFinal (nodoD *lista, nodoD *nuevo)
+{
+    nodoD *seg=lista;
+    if(lista==NULL)
+    {
+        lista==nuevo;
     }
     else
     {
@@ -44,69 +140,11 @@ nodo *agregarFinal (nodo *lista, nodo *nn)
         {
             if(seg->sig==NULL)
             {
-                seg->sig=nn;
+                seg->sig=nuevo;
+                nuevo->ante=seg;
             }
-            seg=seg->sig;
-        }
-    }
-
-    return seg;
-}
-
-nodo *agregarEnOrden (nodo *lista, nodo *nn)
-{
-    nodo *seg=lista;
-    nodo *ante=lista;
-
-    if (lista==NULL)
-    {
-        lista=nn;
-    }
-    else if (lista->dato>nn->dato)
-    {
-        lista=agregarPrincipio(lista, nn);
-    }
-    else
-    {
-        while (seg!=NULL)
-        {
-            if(nn->dato>seg->dato)
+            else
             {
-                ante->sig=nn;
-                nn->sig=seg;
-            }
-            ante=seg;
-            seg=seg->sig;
-        }
-    }
-
-    return lista;
-}
-
-nodo *borrarNodo (int dato, nodo *lista)
-{
-    if (lista!=NULL)
-    {
-        nodo *aBorrar;
-        if (dato==lista->dato)
-        {
-            aBorrar=lista;
-            lista=aBorrar->sig;
-            free(aBorrar);
-        }
-        else
-        {
-            nodo *seg=lista;
-            nodo *ante=seg;
-
-            while (seg!=NULL)
-            {
-                if(dato==seg->dato)
-                {
-                    ante->sig=seg->sig;
-                    free(seg);
-                }
-                ante=seg;
                 seg=seg->sig;
             }
         }
@@ -114,10 +152,44 @@ nodo *borrarNodo (int dato, nodo *lista)
 
     return lista;
 }
-
-void mostrarNodo (nodo *aux)
+fila * agregarTopAFila (nodoS *lista)
 {
-    printf ("Dato: %d", aux->dato);
+    nodoD *aux;
+    fila *fila;
+    while(lista!=NULL)
+    {
+        aux=crearNodo(lista->dato);
+        if(fila->primero==NULL)
+        {
+            fila->primero=aux;
+            fila->ultimo=aux;
+        }
+        else
+        {
+             fila->primero=agregarAlFinal(fila->primero, aux);
+             fila->ultimo=aux;
+        }
+    }
+    return fila;
 }
 
-///
+///5
+
+void mostrarListaDoble (nodoD *lista)
+{
+    while(lista!=NULL)
+    {
+        mostrarYoutuber(lista->dato);
+        lista=lista->sig;
+    }
+}
+
+void mostrarFila (fila *fila)
+{
+    nodoD *seg=fila;
+    while(fila->primero!=NULL)
+    {
+        mostrarListaDoble(seg);
+        fila
+    }
+}
